@@ -1,0 +1,6 @@
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: true
+BreakConstructorInitializers: BeforeComma
+BreakBeforeTernaryOperators: true
+IncludeBlocks: Regroup
+ColumnLimit: 120
