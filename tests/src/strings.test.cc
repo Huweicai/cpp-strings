@@ -297,3 +297,79 @@ TEST_CASE("LastIndexByte") {
     REQUIRE(strings::LastIndexByte(test_case.str, test_case.sep) == test_case.expected);
   }
 }
+
+TEST_CASE("SplitN") {
+  struct TestCase {
+    std::string s;
+    std::string sep;
+    int n;
+    std::vector<std::string> expected;
+  };
+
+  std::vector<TestCase> cases = {
+      {"", "", -1, {}},
+      {"abcd", "", 0, {}},
+      {"abcd", "a", 0, {}},
+      {"abcd", "a", -1, {"", "bcd"}},
+      {"abcd", "z", -1, {"abcd"}},
+      {"1,2,3,4", ",", -1, {"1", "2", "3", "4"}},
+      {"1....2....3....4", "...", -1, {"1", ".2", ".3", ".4"}},
+      {"☺☻☹", "☹", -1, {"☺☻", ""}},
+      {"☺☻☹", "~", -1, {"☺☻☹"}},
+      {"1 2 3 4", " ", 3, {"1", "2", "3 4"}},
+      {"1 2", " ", 3, {"1", "2"}},
+      {"", "T", INT_MAX / 4, {""}},
+      {"\xff-\xff", "-", -1, {"\xff", "\xff"}},
+  };
+
+  for (const auto &test_case : cases) {
+    auto a = strings::SplitN(test_case.s, test_case.sep, test_case.n);
+    INFO("Input: " << test_case.s << ", sep: " << test_case.sep << ", n: " << test_case.n);
+    REQUIRE(a == test_case.expected);
+
+    if (test_case.n == 0) {
+      continue;
+    }
+
+    auto s = strings::Join(a, test_case.sep);
+    REQUIRE(s == test_case.s);
+
+    if (test_case.n < 0) {
+      auto b = strings::SplitN(test_case.s, test_case.sep, -1);
+      REQUIRE(a == b);
+    }
+  }
+}
+
+TEST_CASE("SplitAfterN") {
+  struct TestCase {
+    std::string s;
+    std::string sep;
+    int n;
+    std::vector<std::string> expected;
+  };
+
+  std::vector<TestCase> cases = {
+      {"abcd", "a", -1, {"a", "bcd"}},
+      {"abcd", "z", -1, {"abcd"}},
+      {"1,2,3,4", ",", -1, {"1,", "2,", "3,", "4"}},
+      {"1....2....3....4", "...", -1, {"1...", ".2...", ".3...", ".4"}},
+      {"1 2 3 4", " ", 3, {"1 ", "2 ", "3 4"}},
+      {"1 2 3", " ", 3, {"1 ", "2 ", "3"}},
+      {"1 2", " ", 3, {"1 ", "2"}},
+  };
+
+  for (const auto &test_case : cases) {
+    auto a = strings::SplitAfterN(test_case.s, test_case.sep, test_case.n);
+    INFO("Input: " << test_case.s << ", sep: " << test_case.sep << ", n: " << test_case.n);
+    REQUIRE(a == test_case.expected);
+
+    auto s = strings::Join(a, "");
+    REQUIRE(s == test_case.s);
+
+    if (test_case.n < 0) {
+      auto b = strings::SplitAfterN(test_case.s, test_case.sep, -1);
+      REQUIRE(a == b);
+    }
+  }
+}

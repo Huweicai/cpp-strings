@@ -1,7 +1,9 @@
 #pragma once
 
 #include <set>
+#include <sstream>
 #include <string>
+#include <vector>
 
 namespace strings {
 
@@ -69,6 +71,90 @@ int LastIndexByte(const std::string &s, char c) {
     if (s[i] == c) return i;
 
   return -1;
+}
+
+static std::vector<std::string> genSplit(const std::string &s, const std::string &sep, size_t sepSave, int n) {
+  if (n == 0) return {};
+  if (sep.empty()) return {};
+
+  std::vector<std::string> result;
+  if (n > 0) result.reserve(n);
+
+  size_t start = 0, end;
+  while ((n < 0 || static_cast<int>(result.size()) < n - 1) && (end = s.find(sep, start)) != std::string::npos) {
+    result.emplace_back(s.substr(start, end - start + sepSave));
+    start = end + sep.length();
+  }
+
+  result.emplace_back(s.substr(start));
+  return result;
+}
+
+// SplitN slices s into substrings separated by sep and returns a vector of
+// the substrings between those separators.
+//
+// The count determines the number of substrings to return:
+// n > 0: at most n substrings; the last substring will be the unsplit remainder.
+// n == 0: the result is an empty vector (zero substrings)
+// n < 0: all substrings
+std::vector<std::string> SplitN(const std::string &s, const std::string &sep, int n) { return genSplit(s, sep, 0, n); }
+
+// SplitAfterN slices s into substrings after each instance of sep and
+// returns a slice of those substrings.
+//
+// The count determines the number of substrings to return:
+//
+//	n > 0: at most n substrings; the last substring will be the unsplit remainder.
+//	n == 0: the result is nil (zero substrings)
+//	n < 0: all substrings
+//
+// Edge cases for s and sep (for example, empty strings) are handled
+// as described in the documentation for SplitAfter.
+std::vector<std::string> SplitAfterN(const std::string &s, const std::string &sep, int n) {
+  return genSplit(s, sep, sep.size(), n);
+}
+
+// Split slices s into all substrings separated by sep and returns a slice of
+// the substrings between those separators.
+//
+// If s does not contain sep and sep is not empty, Split returns a
+// slice of length 1 whose only element is s.
+//
+// If sep is empty, Split returns an empty vector.
+//
+// It is equivalent to SplitN with a count of -1.
+//
+// To split around the first instance of a separator, see Cut.
+std::vector<std::string> Split(const std::string &s, const std::string &sep) { return genSplit(s, sep, 0, -1); }
+
+// SplitAfter slices s into all substrings after each instance of sep and
+// returns a slice of those substrings.
+//
+// If s does not contain sep and sep is not empty, SplitAfter returns
+// a slice of length 1 whose only element is s.
+//
+// If sep is empty, Split returns an empty vector.
+//
+// It is equivalent to SplitAfterN with a count of -1.
+std::vector<std::string> SplitAfter(const std::string &s, const std::string &sep) {
+  return genSplit(s, sep, sep.size(), -1);
+}
+
+// Join concatenates the elements of its first argument to create a single string.
+// The separator string sep is placed between elements in the resulting string.
+std::string Join(const std::vector<std::string> &elems, const std::string &sep) {
+  if (elems.empty()) {
+    return "";
+  }
+
+  std::ostringstream oss;
+  for (size_t i = 0; i < elems.size(); ++i) {
+    if (i != 0) oss << sep;
+
+    oss << elems[i];
+  }
+
+  return oss.str();
 }
 
 } // namespace strings
