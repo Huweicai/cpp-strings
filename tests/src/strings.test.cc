@@ -209,3 +209,91 @@ TEST_CASE("ContainsAny") {
     REQUIRE(strings::ContainsAny(test_case.str, test_case.substr) == test_case.expected);
   }
 }
+
+TEST_CASE("LastIndex") {
+  struct TestCase {
+    std::string str;
+    std::string substr;
+    int expected;
+  };
+
+  TestCase cases[] = {
+      {"", "", 0},
+      {"", "a", -1},
+      {"", "foo", -1},
+      {"fo", "foo", -1},
+      {"foo", "foo", 0},
+      {"foo", "f", 0},
+      {"oofofoofooo", "f", 7},
+      {"oofofoofooo", "foo", 7},
+      {"barfoobarfoo", "foo", 9},
+      {"foo", "", 3},
+      {"foo", "o", 2},
+      {"abcABCabc", "A", 3},
+      {"abcABCabc", "a", 6},
+  };
+
+  for (const auto &test_case : cases) {
+    INFO("Input: " << test_case.str << ", " << test_case.substr << " Want: " << test_case.expected);
+    REQUIRE(strings::LastIndex(test_case.str, test_case.substr) == test_case.expected);
+  }
+}
+
+TEST_CASE("IndexAny") {
+  struct TestCase {
+    std::string str;
+    std::string chars;
+    int expected;
+  };
+
+  TestCase cases[] = {
+      {"", "", -1},       {"", "a", -1},     {"", "abc", -1},
+      {"a", "", -1},      {"a", "a", 0},     {"aaa", "a", 0},
+      {"abc", "xyz", -1}, {"abc", "xcz", 2}, {"aRegExp*", ".(|)*+?^$[]", 7},
+  };
+
+  for (const auto &test_case : cases) {
+    INFO("Input: " << test_case.str << ", " << test_case.chars << " Want: " << test_case.expected);
+    REQUIRE(strings::IndexAny(test_case.str, test_case.chars) == test_case.expected);
+  }
+}
+
+TEST_CASE("LastIndexAny") {
+  struct TestCase {
+    std::string str;
+    std::string chars;
+    int expected;
+  };
+
+  TestCase cases[] = {
+      {"", "", -1},       {"", "a", -1},     {"", "abc", -1},
+      {"a", "", -1},      {"a", "a", 0},     {"aaa", "a", 2},
+      {"abc", "xyz", -1}, {"abc", "xcz", 2}, {"aRegExp*", ".(|)*+?^$[]", 7},
+  };
+
+  for (const auto &test_case : cases) {
+    INFO("Input: " << test_case.str << ", " << test_case.chars << " Want: " << test_case.expected);
+    REQUIRE(strings::LastIndexAny(test_case.str, test_case.chars) == test_case.expected);
+  }
+}
+
+TEST_CASE("LastIndexByte") {
+  struct TestCase {
+    std::string str;
+    char sep;
+    int expected;
+  };
+
+  TestCase cases[] = {
+      {"", 'q', -1},
+      {"abcdef", 'q', -1},
+      {"abcdefabcdef", 'a', static_cast<int>(std::string("abcdef").size())},      // something in the middle
+      {"abcdefabcdef", 'f', static_cast<int>(std::string("abcdefabcde").size())}, // last byte
+      {"zabcdefabcdef", 'z', 0},                                                  // first byte
+  };
+
+  for (const auto &test_case : cases) {
+    INFO("Input: " << test_case.str << ", " << test_case.sep << " Want: " << test_case.expected);
+    REQUIRE(strings::LastIndexByte(test_case.str, test_case.sep) == test_case.expected);
+  }
+}
