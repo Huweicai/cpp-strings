@@ -373,3 +373,62 @@ TEST_CASE("SplitAfterN") {
     }
   }
 }
+
+TEST_CASE("Fields") {
+  struct FieldsTest {
+    std::string s;
+    std::vector<std::string> want;
+  };
+
+  FieldsTest cases[] = {
+      {"", {}},
+      {" ", {}},
+      {" \t ", {}},
+      {"  abc  ", {"abc"}},
+      {"1 2 3 4", {"1", "2", "3", "4"}},
+      {"1  2  3  4", {"1", "2", "3", "4"}},
+      {"1\t\t2\t\t3\t4", {"1", "2", "3", "4"}},
+      {"\n™\t™\n", {"™", "™"}},
+  };
+
+  for (const auto &test_case : cases) {
+    INFO("Input: " << test_case.s);
+    REQUIRE(strings::Fields(test_case.s) == test_case.want);
+  }
+}
+
+TEST_CASE("FieldsFunc") {
+  struct FieldsTest {
+    std::string s;
+    std::vector<std::string> a;
+  };
+
+  FieldsTest cases[] = {
+      {"", {}},
+      {" ", {}},
+      {" \t ", {}},
+      {"  abc  ", {"abc"}},
+      {"1 2 3 4", {"1", "2", "3", "4"}},
+      {"1  2  3  4", {"1", "2", "3", "4"}},
+      {"1\t\t2\t\t3\t4", {"1", "2", "3", "4"}},
+      {"\n™\t™\n", {"™", "™"}},
+  };
+
+  for (const auto &test_case : cases) {
+    INFO("Input: " << test_case.s);
+    REQUIRE(strings::FieldsFunc(test_case.s, [](char c) { return std::isspace(c); }) == test_case.a);
+  }
+
+  auto pred = [](char c) { return c == 'X'; };
+  FieldsTest funcCases[] = {
+      {"", {}},
+      {"XX", {}},
+      {"XXhiXXX", {"hi"}},
+      {"aXXbXXXcX", {"a", "b", "c"}},
+  };
+
+  for (const auto &test_case : funcCases) {
+    INFO("Input: " << test_case.s);
+    REQUIRE(strings::FieldsFunc(test_case.s, pred) == test_case.a);
+  }
+}

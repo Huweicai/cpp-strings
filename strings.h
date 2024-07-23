@@ -140,6 +140,36 @@ std::vector<std::string> SplitAfter(const std::string &s, const std::string &sep
   return genSplit(s, sep, sep.size(), -1);
 }
 
+// FieldsFunc splits the string s at each run of characters satisfying f(c)
+// and returns an array of slices of s. If all characters in s satisfy f(c) or the
+// string is empty, an empty vector is returned.
+std::vector<std::string> FieldsFunc(const std::string &s, std::function<bool(char)> f) {
+  std::vector<std::string> result{};
+  std::string::size_type start = std::string::npos;
+
+  for (std::string::size_type i = 0; i < s.length(); ++i) {
+    if (f(s[i])) {
+      if (start != std::string::npos) {
+        result.push_back(s.substr(start, i - start));
+        start = std::string::npos;
+      }
+    } else {
+      if (start == std::string::npos) start = i;
+    }
+  }
+
+  // Last field might end at EOF.
+  if (start != std::string::npos) result.push_back(s.substr(start, s.length() - start));
+
+  return result;
+}
+
+// Fields splits the string s around each instance of one or more consecutive white space
+// characters, returning a vector of substrings of s or an empty vector if s contains only white space.
+std::vector<std::string> Fields(const std::string &s) {
+  return FieldsFunc(s, [](char c) { return std::isspace(c); });
+}
+
 // Join concatenates the elements of its first argument to create a single string.
 // The separator string sep is placed between elements in the resulting string.
 std::string Join(const std::vector<std::string> &elems, const std::string &sep) {
