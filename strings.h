@@ -187,4 +187,24 @@ std::string Join(const std::vector<std::string> &elems, const std::string &sep) 
   return oss.str();
 }
 
+// HasPrefix tests whether the string s begins with prefix.
+bool HasPrefix(const std::string &s, const std::string &prefix) {
+  if (s.size() < prefix.size()) return false;
+  for (size_t i = 0; i < prefix.size(); ++i)
+    if (s[i] != prefix[i]) return false;
+
+  return true;
+}
+
+// HasSuffix tests whether the string s ends with suffix.
+bool HasSuffix(const std::string &s, const std::string &suffix) {
+  if (s.size() < suffix.size()) return false;
+
+  size_t offset = s.size() - suffix.size();
+  for (size_t i = 0; i < suffix.size(); ++i)
+    if (s[offset + i] != suffix[i]) return false;
+
+  return true;
+}
+
 } // namespace strings

@@ -432,3 +432,39 @@ TEST_CASE("FieldsFunc") {
     REQUIRE(strings::FieldsFunc(test_case.s, pred) == test_case.a);
   }
 }
+
+TEST_CASE("HasPrefix") {
+  struct TestCase {
+    std::string s;
+    std::string prefix;
+    bool expected;
+  };
+
+  TestCase cases[] = {
+      {"", "", true},      {"", "a", false},     {"a", "", true},         {"a", "a", true},
+      {"abc", "ab", true}, {"abc", "bc", false}, {"abcdef", "abc", true}, {"abcdef", "def", false},
+  };
+
+  for (const auto &test_case : cases) {
+    INFO("Input: " << test_case.s << ", Prefix: " << test_case.prefix << " Want: " << test_case.expected);
+    REQUIRE(strings::HasPrefix(test_case.s, test_case.prefix) == test_case.expected);
+  }
+}
+
+TEST_CASE("HasSuffix") {
+  struct TestCase {
+    std::string s;
+    std::string suffix;
+    bool expected;
+  };
+
+  TestCase cases[] = {
+      {"", "", true},       {"", "a", false},    {"a", "", true},          {"a", "a", true},
+      {"abc", "ab", false}, {"abc", "bc", true}, {"abcdef", "abc", false}, {"abcdef", "def", true},
+  };
+
+  for (const auto &test_case : cases) {
+    INFO("Input: " << test_case.s << ", Suffix: " << test_case.suffix << " Want: " << test_case.expected);
+    REQUIRE(strings::HasSuffix(test_case.s, test_case.suffix) == test_case.expected);
+  }
+}
